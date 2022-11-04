@@ -7,7 +7,14 @@ import (
 	"io"
 )
 
-type Hoverboard struct {
+type Hoverboard interface {
+	Close()
+	SetSteer(steer int16)
+	SetSpeed(speed int16)
+	GetStatus() HoverboardStatus
+}
+
+type HoverboardImpl struct {
 	port       io.ReadWriteCloser
 	steer      int16
 	speed      int16
@@ -26,7 +33,7 @@ type HoverboardStatus struct {
 	CmdLed     uint16
 }
 
-func NewHoverboard(portName string) (*Hoverboard, error) {
+func NewHoverboard(portName string) (Hoverboard, error) {
 	options := serial.OpenOptions{
 		PortName:        portName,
 		BaudRate:        115200,
@@ -38,25 +45,25 @@ func NewHoverboard(portName string) (*Hoverboard, error) {
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("failed to open serial port: %v", err))
 	}
-	h := &Hoverboard{port, 0, 0, false, make([]byte, 30), HoverboardStatus{0, 0, 0, 0, 0, 0, 0}}
+	h := &HoverboardImpl{port, 0, 0, false, make([]byte, 30), HoverboardStatus{0, 0, 0, 0, 0, 0, 0}}
 	go h.receiveLoop()
 	go h.sendLoop()
 	return h, nil
 }
 
-func (h *Hoverboard) Close() {
+func (h *HoverboardImpl) Close() {
 	h.stop = true
 	h.port.Close()
 }
 
-func (h *Hoverboard) SetSteer(steer int16) {
+func (h *HoverboardImpl) SetSteer(steer int16) {
 	h.steer = steer
 }
 
-func (h *Hoverboard) SetSpeed(speed int16) {
+func (h *HoverboardImpl) SetSpeed(speed int16) {
 	h.speed = speed
 }
 
-func (h *Hoverboard) GetStatus() HoverboardStatus {
+func (h *HoverboardImpl) GetStatus() HoverboardStatus {
 	return h.status
 }

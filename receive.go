@@ -5,13 +5,13 @@ import (
 	"log"
 )
 
-func (h *Hoverboard) receiveLoop() {
+func (h *HoverboardImpl) receiveLoop() {
 	for !h.stop {
 		h.receive()
 	}
 }
 
-func (h *Hoverboard) receive() []byte {
+func (h *HoverboardImpl) receive() []byte {
 	buf := make([]byte, 1)
 	n, err := h.port.Read(buf)
 	if err != nil {

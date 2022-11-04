@@ -7,7 +7,7 @@ import (
 
 const sendLoopInterval = 50
 
-func (h *Hoverboard) sendLoop() {
+func (h *HoverboardImpl) sendLoop() {
 	lastLoop := time.Now()
 	for !h.stop {
 		duration := time.Since(lastLoop)
@@ -20,7 +20,7 @@ func (h *Hoverboard) sendLoop() {
 	}
 }
 
-func (h *Hoverboard) send() {
+func (h *HoverboardImpl) send() {
 	//log.Printf("sending steer=%v speed=%v", h.steer, h.speed)
 	message, err := encodeSendMessage(h.steer, h.speed)
 	if err != nil {
